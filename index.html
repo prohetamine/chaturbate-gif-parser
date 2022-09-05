@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <style>
+    img {
+      width: 300px;
+    }
+  </style>
+  <div id='root'></div>
+  <script>
+    const root = document.querySelector('#root')
+
+    const loadImage = url => new Promise(res => {
+      const img = new Image()
+      img.onload = () => res(img)
+      img.onerror = () => res(false)
+      img.src = url
+    })
+
+    fetch('urls.txt').then(d => d.text()).then(async _urls => {
+      const urls = Object.keys(_urls.match(/.+/gi).reduce((ctx, elem) => {
+        ctx[elem] = true
+        return ctx
+      }, {}))
+
+      for (let i = 0; i < urls.length; i++) {
+        const theFirstChild = root.firstChild
+
+        const img = await loadImage(urls[i])
+
+        if (img) {
+          root.appendChild(img)
+        }
+      }
+    })
+  </script>
+</body>
+</html>

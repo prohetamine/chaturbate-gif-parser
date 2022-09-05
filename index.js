@@ -8,15 +8,25 @@ const word = () => {
 }
 
 const instance = async () => {
-  const data = await rp('https://emote.highwebmedia.com/autocomplete?slug='+word())
-  fs.appendFile(__dirname+'/urls', JSON.parse(data).emoticons.map(e => e.url).join('\n')+'\n', () => {})
+  try {
+    const url = 'https://emote.highwebmedia.com/autocomplete?slug='+word()
+    console.log(url)
+    return await rp(url)
+  } catch (e) {}
 }
 
 ;(async () => {
   let i = 0
   for (;;) {
     i++
-    console.log(i)
-    await Promise.all(Array(10).fill(10).map(e => instance()))
+    const datas = await Promise.all(
+      Array(10)
+        .fill(true).map(
+          (e, i2) =>
+            instance()
+        )
+    )
+
+    fs.appendFileSync(__dirname+'/urls.txt', datas.map(data => data ? JSON.parse(data).emoticons.map(e => e.url) : []).flat().join('\n')+'\n')
   }
 })()
